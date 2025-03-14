@@ -1,0 +1,13 @@
+# Persisten Volume Claim file which can be used by pods to claim the volume
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: host-pvc
+spec:
+  volumeName: host-pv # connect to the persistent volume definition
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi

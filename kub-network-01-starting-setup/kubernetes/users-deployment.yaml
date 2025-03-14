@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      # 2 containers running in the same POD but only the users container is exposed to the outside world with a service (see users-service.yaml)
+      containers:
+      - name: users
+        image: reko8680/kub-demo-users:latest
+        # localhost is the magic address that can be used for POD internal communication (here we talk to the auth app from the users app in the same POD)
+        env:
+        - name: AUTH_ADDRESS
+          value: localhost
+      - name: auth
+        image: reko8680/kub-demo-auth:latest

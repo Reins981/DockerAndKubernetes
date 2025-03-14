@@ -1,0 +1,13 @@
+# With services we get a stable IP address for our pods!!!
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector: 
+    app: auth # which pods should be part of that service
+  type: ClusterIP # POD to POD communication inside a cluster, we are not getting exposed to the outside world
+  ports:
+    - protocol: "TCP"
+      port: 80
+      targetPort: 80

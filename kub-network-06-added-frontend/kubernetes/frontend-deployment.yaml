@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: reko8680/kub-demo-frontend:latest
+          env:
+            - name: TASK_ADDRESS
+              # value: "10.99.104.252"
+              value: "tasks-service.default"

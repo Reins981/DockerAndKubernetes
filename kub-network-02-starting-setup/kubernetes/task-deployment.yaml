@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: task
+  template:
+    metadata:
+      labels:
+        app: task
+    spec:
+      # each container runs in a separate POD
+      containers:
+      - name: auth
+        image: reko8680/kub-demo-task:latest
+        # Run:
+        # kubectl get services command to fetch the IP address of the auth service we want to talk to
+        env:
+        - name: AUTH_ADDRESS
+          # value: "10.111.36.77" # IP address of the auth service
+          # Domain Names: IP address of the auth service which is a CORE DNS feature of kubernetes, seet kubectl get services command
+          # after the . comes the namespace, in this case the namespace is default, see kubectl get namespaces command
+          value: "auth-service.default"
+        - name: TASKS_FOLDER
+          value: "tasks"

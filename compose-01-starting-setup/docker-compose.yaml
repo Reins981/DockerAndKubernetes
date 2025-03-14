@@ -1,0 +1,45 @@
+# Docker compose will automatically create a default network for all the services defined here
+# But of course you can create one manually and use it here
+# Docker compose does not work for containers on different hosts!!!!
+services:
+  mongodb:
+    image: 'mongo'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: rene
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    volumes:
+      - data:/data/db
+  backend:
+    build: ./backend
+    # container_name: name-of-container -> optional if you want to change the default name. The default name can be used to communiate with the container
+    # build:
+      # context: ./backend -> The path to the Dockerfile and everything that is needed to build the image, all files to be copied
+      # dockerfile: Dockerfile
+      # args:
+        # some-arg: 1
+    environment:
+      MONGODB_USERNAME: rene
+      MONGODB_PASSWORD: secret
+    # Relative path for bind mount are relative to the location of the docker-compose file and are the way to go
+    volumes:
+      - logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "80:80"
+    depends_on:
+      - mongodb
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend/src:/app/src"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    # stdin_open: true -> this would be interactive mode
+    # tty: true -> attach a terminal to the container -it
+
+volumes:
+  data:
+  logs:

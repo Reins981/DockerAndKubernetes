@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app-deployment
+  labels: 
+    group: example
+spec:
+  replicas: 1
+  # Very important!!! select the to be controlled pods by the deployment, that must match a pod label(s)
+  selector:
+    # matchLabels:
+      # app: second-app
+      # tier: backend
+    matchExpressions:
+      - {key: app, operator: In, values: [second-app, first-app]}
+  template:
+    metadata: 
+      labels:
+        app: second-app
+        tier: backend
+    spec: 
+      containers:
+        - name: second-node
+          image: reko8680/kub-first-app:4
+        # - name: ...
+        #   image: ...
+

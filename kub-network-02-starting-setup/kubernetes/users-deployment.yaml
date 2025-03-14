@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      # each container runs in a separate POD
+      containers:
+      - name: users
+        image: reko8680/kub-demo-users:latest
+        # Run:
+        # kubectl get services command to fetch the IP address of the auth service we want to talk to
+        env:
+        - name: AUTH_ADDRESS
+          value: "10.111.36.77" # IP address of the auth service

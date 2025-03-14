@@ -1,0 +1,19 @@
+# This sets up a host path standalone volume detached from any pod. Normally this would be also really node independent
+# but since we are working only on one node (minikube), hostPath is the only option to create a volume that is not attached to a pod
+# So if we are working in a multi node environemnt, we would have to use a different type of volume.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: host-pv
+spec:
+  capacity:
+    storage: 1Gi
+  volumeMode: Filesystem
+  storageClassName: standard # This is the default storage class see, kubectl get sc
+  accessModes:
+    - ReadWriteOnce # Can be claimed by different pods for writing and reading but they have to run on the same node (see hostPath type)
+  hostPath:
+    path: /data
+    type: DirectoryOrCreate
+
+# This yaml file is just the volume definition, in order to use it we need to use a PersistentVolumeClaim
