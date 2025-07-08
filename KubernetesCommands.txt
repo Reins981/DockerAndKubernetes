@@ -104,7 +104,7 @@ kubectl rollout undo deployment/first-app --to-revision=1
 
 kubectl get sc 
 
-** Get persistent voluems: **
+** Get persistent volumes: **
 
 kubectl get pv
 
@@ -120,7 +120,7 @@ kubectl get namespaces
 
 1. Change the kubectlconfig file not to use minikube but Amazon EKS using the AWS command line interface
 2. Download and install AWS command line interface
-3. run aws configure, enter you access key id and secret key, ... (now we can talk to our AWS account)
+3. run aws configure, enter your access key id and secret key, ... (now we can talk to our AWS account)
 4. aws eks  --region us-east-2 update-kubeconfig --name <clustername> (now kubectl can talk to AWS EKS)
 5. kubectl get pods -> this will talk to the AWS EKS cluster in the cloud
 
@@ -144,4 +144,61 @@ kubectl delete -f deployment.yaml -f service.yaml
 group= example is a label defined for the deployment or service object or both
 
 kubectl delete deployments,services -l group=example
+
+
+Docker compose commands and hints:
+
+Elegant way to orchestrate multi container setups.
+
+Services are Containers.
+
+We just need one central config file (docker-compose.yaml)
+
+Docker compose will create a default network automatically for all the services configured in the compose file
+and it will also add all the services to that network out of the box.
+
+Docker compose will use the service names in order to connect to services (establish network connections)!
+Note: You have to use of course the same service name as defined in the yaml file in the respective code area where you connect to that service.
+
+Images: if an image already exists it will not rebuild the image. There needs to be a change in the code or Dockerfile in order to rebuild the image.
+
+** Start all the services in the compose file in attached mode, creates volumes and also pull and build all the images in it and create and attach the network**
+
+docker-compose up
+
+** Start in detached mode **
+
+docker-compose up -d
+
+** Bring up multiple services **
+
+docker-compose up service1 service2 ...
+
+** Stop all services and remove all containers and network **
+
+docker-compose down
+
+** Also remove volumes **
+
+docker-compose down -v 
+
+** Force that images are rebuild before starting the containers (services) **
+
+docker-compose up --build
+
+** Just build images without starting a container after **
+
+docker-compose build
+
+** Bring up utility containers which have an ENTRYPOINT defined in the Dockerfile **
+
+Here we want to run a single service from the docker compose file named npm with the command init that should be appended after the ENTRYPOINT base command npm
+
+docker-compose run npm init
+
+With docker-compose run the containers are not removed automatically like with docker-compose down. We need to specify the --rm flag
+
+docker-compose run --rm npm init
+
+** Note: It is also possible by defining an "entrypoint" and the "working_dir" in the docker-compose file itself, essentially overriding the docker file -> see artisan , php laravel project **
 
