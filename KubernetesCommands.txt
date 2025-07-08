@@ -1,0 +1,147 @@
+** Create a cluster (VM maschine) on your lokal host with minikube: **
+
+minikube start --driver=docker
+minikube status
+minikube dashboard
+
+** Create and assign a service to our deployment with the name first-app: This will expose our pod (container) to the outside so that we can reach the application running inside the container**
+
+minikube service first-app
+
+
+
+Imperative Approach:
+
+Kubernetes commands:
+
+** Create a deployment: (The Master node on the cluster will try to pull the image from the docker registry and create a deployment which creates a pod and a container inside)**
+
+kubectl create deployment first-app --image=reko8680/kub-first-app
+
+** Delete Deployment: **
+
+kubectl delete deployment first-app
+
+** Get pods: **
+
+kubectl get pods
+
+** get deployments: **
+
+kubectl get deployments
+
+** Scale deployments: (add 2 Pods to an already existing pod in the cluster)**
+
+kubectl scale deployment first-app --replicas 3
+
+** Make the container in the pod reachable from the outside with the help of a loadbalancer service: **
+
+kubectl expose deployment first-app --port=8080 --type=LoadBalancer
+
+** Debug the pod: **
+
+kubectl describe pod first-app-5878dc875-dx7z4
+
+
+** Get services and their internal cluster IP which is used internally to reach all of the pods and containers inside this cluster: **
+
+kubectl get services
+
+** Delete service for our deplyoment: **
+
+kubectl delete service first-app
+
+
+** Update a container of a deployment with a new image: Set the container kub-first-app to the new image we want to use**
+
+Note images will only be downloaded again by kubernetes if they have a different tag!!!
+
+docker build -t reko8680/kub-first-app:2 .
+
+docker push reko8680/kub-first-app:2
+
+kubectl set image deployment/first-app kub-first-app=reko8680/kub-first-app:2
+
+kubectl rollout status deployment/first-app
+
+** Create a failed scenario with an image that does not exist and then rollback our deployment: **
+
+kubectl set image deployment/first-app kub-first-app=reko8680/kub-first-app:3
+
+kubectl rollout status deployment/first-app
+
+kubectl get pods
+
+Undo the latest faulty deployment:
+
+kubectl rollout undo deployment/first-app
+
+
+** Rollout to another version of the deployment: ** 
+
+kubectl rollout history deployment/first-app
+
+kubectl rollout history deployment/first-app --revision 1
+deployment.apps/first-app with revision #1
+Pod Template:
+  Labels:       app=first-app
+        pod-template-hash=5878dc875
+  Containers:
+   kub-first-app:
+    Image:      reko8680/kub-first-app
+    Port:       <none>
+    Host Port:  <none>
+    Environment:        <none>
+    Mounts:     <none>
+  Volumes:      <none>
+  Node-Selectors:       <none>
+  Tolerations:  <none>
+
+kubectl rollout undo deployment/first-app --to-revision=1
+
+
+** Get storage classes: **
+
+kubectl get sc 
+
+** Get persistent voluems: **
+
+kubectl get pv
+
+** get persistent volume claims: **
+
+kubectl get pvc
+
+** Get namespaces for Core DNS feature: **
+
+kubectl get namespaces
+
+** How to talk to the Amazon EKS service cloud provider with kubectl: **
+
+1. Change the kubectlconfig file not to use minikube but Amazon EKS using the AWS command line interface
+2. Download and install AWS command line interface
+3. run aws configure, enter you access key id and secret key, ... (now we can talk to our AWS account)
+4. aws eks  --region us-east-2 update-kubeconfig --name <clustername> (now kubectl can talk to AWS EKS)
+5. kubectl get pods -> this will talk to the AWS EKS cluster in the cloud
+
+
+Declarative approach (Comparable using docker compose with compose files):
+
+** apply a yaml config files to kubernetes (A config file is defined and applied to change the desired state): **
+
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+
+# Expose the service
+minikube service backend
+
+** Delete a deployment and a service: **
+
+kubectl delete -f deployment.yaml -f service.yaml
+
+** Select objects by label which should be deleted: **
+
+group= example is a label defined for the deployment or service object or both
+
+kubectl delete deployments,services -l group=example
+
